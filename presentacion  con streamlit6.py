@@ -8,7 +8,7 @@ st.set_page_config(page_title="Fidegas Panel", layout="wide")
 
 # --- RELLENA SOLO ESTO ---
 # El ID es el código largo de la URL de tu Google Sheet
-ID_HOJA = "1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y
+ID_HOJA = "1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y"
 # --- USUARIOS ---
 USUARIOS = {"admin": "123", "mantenimiento": "456"}
 
@@ -69,4 +69,5 @@ else:
 if st.sidebar.button("Salir"):
     del st.session_state["autenticado"]
     st.rerun()
+
 
