@@ -32,20 +32,28 @@ def check_password():
 
 if check_password():
     # 3. CARGA DE DATOS (Ruta relativa para la nube)
-    archivo_excel = "inventario_completo_42_sondas.xlsx"
-    ruta_logo = "logo.png"
+   # --- 3. CONEXIÓN CON GOOGLE SHEETS ---
+# Pega aquí el enlace que copiaste de "Compartir"
+URL_HOJA = "https://docs.google.com/spreadsheets/d/1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y/edit?usp=sharing"
 
-    @st.cache_data(ttl=60)
-    def cargar_datos():
-        if os.path.exists(archivo_excel):
-            df = pd.read_excel(archivo_excel)
-            if 'Planta' in df.columns:
-                df['Planta'] = pd.to_numeric(df['Planta'], errors='coerce').fillna(0).astype(int)
-            return df
+# Este truco transforma el enlace para que sea legible por código
+CSV_URL = URL_HOJA.split("/edit")[0] + "/export?format=csv"
+
+@st.cache_data(ttl=10) # Se actualiza cada 10 segundos
+def cargar_datos():
+    try:
+        # Leemos directamente de la nube de Google
+        df_sheets = pd.read_csv(CSV_URL)
+        if 'Planta' in df_sheets.columns:
+            df_sheets['Planta'] = pd.to_numeric(df_sheets['Planta'], errors='coerce').fillna(0).astype(int)
+        return df_sheets
+    except Exception as e:
+        st.error(f"Error al conectar con Google Sheets: {e}")
+        # Si falla, intenta cargar el excel de reserva o devuelve vacío
         return pd.DataFrame()
 
-    df = cargar_datos()
-
+# La variable 'ruta_logo' déjala igual si no la habías borrado
+ruta_logo = "logo.png"
     # 4. LOGO Y CABECERA (Solo tras login)
     if os.path.exists(ruta_logo):
         st.image(Image.open(ruta_logo), width=180)
@@ -114,3 +122,4 @@ if check_password():
     if st.sidebar.button("Cerrar Sesión"):
         st.session_state.clear()
         st.rerun()
+
