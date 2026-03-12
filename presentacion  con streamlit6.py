@@ -8,8 +8,7 @@ st.set_page_config(page_title="Fidegas Panel", layout="wide")
 
 # --- RELLENA SOLO ESTO ---
 # El ID es el código largo de la URL de tu Google Sheet
-ID_HOJA = "https://docs.google.com/spreadsheets/d/1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y/edit?usp=sharing" 
-
+ID_HOJA = "1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y
 # --- USUARIOS ---
 USUARIOS = {"admin": "123", "mantenimiento": "456"}
 
@@ -27,7 +26,7 @@ if "autenticado" not in st.session_state:
     st.stop()
 
 # 3. CARGA DE DATOS (GOOGLE SHEETS)
-CSV_URL = f"https://docs.google.com/spreadsheets/d/{ID_HOJA}/export?format=csv"
+CSV_URL = f"https://docs.google.com/spreadsheets/d/1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y/export?format=csv"
 
 @st.cache_data(ttl=5) # Se actualiza muy rápido para pruebas
 def cargar():
@@ -70,3 +69,4 @@ else:
 if st.sidebar.button("Salir"):
     del st.session_state["autenticado"]
     st.rerun()
+
