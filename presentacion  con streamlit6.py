@@ -42,7 +42,8 @@ def cargar_datos():
         return pd.DataFrame()
 
 df = cargar_datos()
-
+st.write("Columnas detectadas:", df.columns.tolist())
+st.write("¿Está vacío el archivo?:", df.empty)
 # 4. INTERFAZ DE LA APP
 if os.path.exists("logo.png"):
     st.image("logo.png", width=120)
@@ -87,3 +88,4 @@ if not df.empty:
 if st.sidebar.button("Cerrar Sesión"):
     st.session_state.clear()
     st.rerun()
+
