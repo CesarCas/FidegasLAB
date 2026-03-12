@@ -32,13 +32,14 @@ def check_password():
 
 if check_password():
     # 3. CARGA DE DATOS (Ruta relativa para la nube)
-   # --- 3. CONEXIÓN CON GOOGLE SHEETS ---
-# Pega aquí el enlace que copiaste de "Compartir"
-URL_HOJA = "https://docs.google.com/spreadsheets/d/1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y/edit?usp=sharing"
+  # Pega aquí el enlace que copiaste de "Compartir"
+#URL_HOJA = "https://docs.google.com/spreadsheets/d/1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y/edit?usp=sharing"
 
 # Este truco transforma el enlace para que sea legible por código
-CSV_URL = URL_HOJA.split("/edit")[0] + "/export?format=csv"
-
+#CSV_URL = URL_HOJA.split("/edit")[0] + "/export?format=csv"
+# Busca el churro de letras y números entre /d/ y /edit de tu navegador
+ID_HOJA = "https://docs.google.com/spreadsheets/d/1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y/edit?usp=sharing" 
+CSV_URL = f"https://docs.google.com/spreadsheets/d/{ID_HOJA}/export?format=csv"
 @st.cache_data(ttl=10) # Se actualiza cada 10 segundos
 def cargar_datos():
     try:
@@ -122,4 +123,5 @@ ruta_logo = "logo.png"
     if st.sidebar.button("Cerrar Sesión"):
         st.session_state.clear()
         st.rerun()
+
 
