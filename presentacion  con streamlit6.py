@@ -5,7 +5,7 @@ import os
 import requests
 
 # 1. CONFIGURACIÓN INICIAL
-st.set_page_config(page_title="Fidegas Smart Control", layout="wide")
+st.set_page_config(page_title="Control de  Sondas de Gases", layout="wide")
 
 # --- RELLENA ESTOS DOS DATOS ---
 ID_HOJA = "1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y"
