@@ -7,7 +7,7 @@ import requests
 st.set_page_config(page_title="Fidegas Smart Control", layout="wide")
 
 ID_HOJA = "1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y"
-URL_API_GOOGLE = "TU_URL_AQUÍ" # <--- Pon tu URL /exec aquí
+URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbxwIdQN5QKtpzkWC8KWk26gU4cNlZzcwUywQBjNfbtcKJhgtnCBWp3TwE94uNz6wIQgqg/exec" # <--- Pon tu URL /exec aquí
 
 USUARIOS = {"admin": "123", "mantenimiento": "456"}
 
