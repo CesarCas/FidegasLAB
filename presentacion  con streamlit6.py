@@ -1,91 +1,86 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-import os
 import requests
 
-# 1. CONFIGURACIÓN INICIAL
-st.set_page_config(page_title="Control de  Sondas de Gases", layout="wide")
+# 1. CONFIGURACIÓN Y CREDENCIALES
+st.set_page_config(page_title="Fidegas Smart Control", layout="wide")
 
-# --- RELLENA ESTOS DOS DATOS ---
 ID_HOJA = "1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y"
-URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbxwIdQN5QKtpzkWC8KWk26gU4cNlZzcwUywQBjNfbtcKJhgtnCBWp3TwE94uNz6wIQgqg/exec"
+URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbxwIdQN5QKtpzkWC8KWk26gU4cNlZzcwUywQBjNfbtcKJhgtnCBWp3TwE94uNz6wIQgqg/exec" # <--- No olvides poner tu URL /exec aquí
 
+USUARIOS = {
+    "admin": "123",
+    "mantenimiento": "456"
+}
 
-# --- USUARIOS ---
-USUARIOS = {"admin": "123", "mantenimiento": "456"}
-
-# 2. SISTEMA DE LOGIN
+# 2. LÓGICA DE SESIÓN Y LOGIN
 if "autenticado" not in st.session_state:
+    st.session_state["autenticado"] = False
+
+def login():
     st.title("🛡️ Acceso Fidegas PoC")
-    u = st.text_input("Usuario")
-    p = st.text_input("Contraseña", type="password")
+    usuario = st.text_input("Usuario")
+    clave = st.text_input("Contraseña", type="password")
     if st.button("Entrar"):
-        if u in USUARIOS and USUARIOS[u] == p:
+        if usuario in USUARIOS and USUARIOS[usuario] == clave:
             st.session_state["autenticado"] = True
             st.rerun()
         else:
-            st.error("Credenciales incorrectas")
+            st.error("Usuario o contraseña incorrectos")
+
+if not st.session_state["autenticado"]:
+    login()
     st.stop()
 
 # 3. CARGA DE DATOS (LECTURA)
-CSV_URL = f"https://docs.google.com/spreadsheets/d/{ID_HOJA}/export?format=csv"
-
-@st.cache_data(ttl=5)
+@st.cache_data(ttl=2)
 def cargar_datos():
+    url_csv = f"https://docs.google.com/spreadsheets/d/{ID_HOJA}/export?format=csv"
     try:
-        df_sheets = pd.read_csv(CSV_URL)
-        if 'Planta' in df_sheets.columns:
-            df_sheets['Planta'] = pd.to_numeric(df_sheets['Planta'], errors='coerce').fillna(0).astype(int)
-        return df_sheets
+        return pd.read_csv(url_csv)
     except:
         return pd.DataFrame()
 
 df = cargar_datos()
-st.write("Columnas detectadas:", df.columns.tolist())
-st.write("¿Está vacío el archivo?:", df.empty)
-# 4. INTERFAZ DE LA APP
-if os.path.exists("logo.png"):
-    st.image("logo.png", width=120)
 
-if not df.empty:
-    st.title("Panel de Control - Fidegas")
-    
-    tab1, tab2 = st.tabs(["📊 Visualización", "🛠️ Gestión y Guardado"])
-
-    with tab1:
-        fig = px.bar(df, x='Num_Serie', y='Días Restantes', color='Días Restantes',
-                     color_continuous_scale='RdYlGn', title="Estado de Sondas")
-        st.plotly_chart(fig, use_container_width=True)
-
-    with tab2:
-        st.subheader("Edición de Datos")
-        # Aquí permitimos editar la tabla
-        df_editado = st.data_editor(df, use_container_width=True, key="editor_vitoria")
-        
-        st.divider()
-        
-        # BOTÓN MÁGICO PARA GUARDAR
-        if st.button("💾 GUARDAR CAMBIOS EN GOOGLE SHEETS"):
-            try:
-                # Tomamos la primera fila como prueba
-                sonda_id = str(df_editado.iloc[0]['Num_Serie'])
-                nuevo_status = str(df_editado.iloc[0]['Estado_Revision'])
-                
-                datos_para_google = {"num_serie": sonda_id, "nuevo_estado": nuevo_status}
-                
-                # Enviamos el dato a Google
-                res = requests.post(URL_API_GOOGLE, json=datos_para_google)
-                
-                if res.text == "OK":
-                    st.success(f"¡Sonda {sonda_id} actualizada en la nube!")
-                    st.balloons()
-                else:
-                    st.error(f"Google dice: {res.text}")
-            except Exception as e:
-                st.error(f"Error técnico: {e}")
-
+# 4. INTERFAZ DE USUARIO (DASHBOARD)
+st.sidebar.title(f"Bienvenido")
 if st.sidebar.button("Cerrar Sesión"):
-    st.session_state.clear()
+    st.session_state["autenticado"] = False
     st.rerun()
 
+st.title("🚀 Fidegas Smart Control")
+
+if not df.empty:
+    st.subheader("🛠️ Gestión de Mantenimiento")
+    st.write("Modifica los datos y pulsa el botón de abajo para sincronizar.")
+    
+    # Tabla editable
+    df_editado = st.data_editor(df, use_container_width=True, key="editor_vitoria")
+    
+    st.divider()
+    
+    # BOTÓN DE GUARDADO
+    if st.button("💾 GUARDAR CAMBIOS EN GOOGLE SHEETS", use_container_width=True):
+        try:
+            # Extraemos Num_Serie y Estado_Revision de la primera fila
+            sonda_id = str(df_editado.iloc[0]['Num_Serie'])
+            nuevo_status = str(df_editado.iloc[0]['Estado_Revision'])
+            
+            payload = {
+                "num_serie": sonda_id,
+                "nuevo_estado": nuevo_status
+            }
+            
+            with st.spinner('Enviando datos a la nube...'):
+                response = requests.post(URL_API_GOOGLE, json=payload)
+                
+                if response.text == "OK":
+                    st.success(f"✅ ¡Sonda {sonda_id} actualizada!")
+                    st.balloons()
+                else:
+                    st.error(f"Error de Google: {response.text}")
+        except Exception as e:
+            st.error(f"Error en la conexión: {e}")
+else:
+    st.warning("No se pudieron cargar los datos. Verifica la conexión con la hoja.")
