@@ -8,7 +8,8 @@ from datetime import datetime, timedelta
 st.set_page_config(page_title="Fidegas Smart Control", layout="wide")
 
 ID_HOJA = "1grw6hICGLD-k4F1LFCmdLX9vaPEYTK20V9GnP6M6O_Y"
-URL_API_GOOGLE = "TU_URL_DE_APPS_SCRIPT_AQUÍ" 
+URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbxwIdQN5QKtpzkWC8KWk26gU4cNlZzcwUywQBjNfbtcKJhgtnCBWp3TwE94uNz6wIQgqg/exec"
+
 
 USUARIOS = {"admin": "123", "mantenimiento": "456"}
 
