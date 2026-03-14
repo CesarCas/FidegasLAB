@@ -58,7 +58,7 @@ def style_semaforo(row):
     return [color] * len(row)
 
 # 5. INTERFAZ
-st.title("🚀 Gestión de Sondas Fidegas")
+st.title("🚀 Gestión de Sondas Laboratorios")
 
 if not df_original.empty:
     tab1, tab2 = st.tabs(["📊 Análisis Visual", "🛠️ Editor de Campo"])
